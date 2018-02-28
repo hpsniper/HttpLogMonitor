@@ -1,11 +1,13 @@
 package core;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import core.formats.CommonLog;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
+import core.formats.CommonLog;
 
 class HttpAlertMonitorDemoTest {
 
@@ -15,7 +17,7 @@ class HttpAlertMonitorDemoTest {
     }
 
     private void writeLogFile() {
-        LogCreator logCreator = new LogCreator("/home/mdecosta/IdeaProjects/HttpLogMonitor/src/main/resources/basiclogfile.log", new CommonLog());
+        LogCreator logCreator = new LogCreator("/basiclogfile.log", new CommonLog());
         logCreator.writeLogLines(3);
     }
 

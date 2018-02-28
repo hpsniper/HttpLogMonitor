@@ -34,7 +34,7 @@ public class LogCreator {
     }
 
     private void writeLogLine(String line) throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(this.logFileLocation, true);
+        FileOutputStream fileOutputStream = new FileOutputStream(getClass().getResource(logFileLocation).getFile(), true);
         byte[] strToBytes = line.getBytes();
         fileOutputStream.write(strToBytes);
         fileOutputStream.close();
@@ -96,7 +96,7 @@ public class LogCreator {
                 "\"GET / HTTP/1.0\"",
                 "\"GET /index.html HTTP/1.0\"",
                 "\"GET /apache_pb.gif HTTP/1.0\"",
-                "\"GET /resource/new\" HTTP/1.0",
+                "\"GET /resource/new HTTP/1.0\"",
                 "\"GET /pages/2756 HTTP/1.0\"",
                 "\"GET /pages/2756/sub_section HTTP/1.0\"",
                 "\"POST /pages/update/2756 HTTP/1.0\"",
