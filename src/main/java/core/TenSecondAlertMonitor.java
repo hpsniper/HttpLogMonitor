@@ -30,19 +30,19 @@ public class TenSecondAlertMonitor extends HttpAlertMonitor {
         clearSectionHits();
     }
 
-    public void addToSectionHits(String section) {
+    private void addToSectionHits(String section) {
         if(!sectionHitMonitor.containsKey(section)) {
             sectionHitMonitor.put(section, 0);
         }
 
-        int hits = sectionHitMonitor.get(section);
-        sectionHitMonitor.put(section, hits + 1);
+        int hits = sectionHitMonitor.get(section) + 1;
+        sectionHitMonitor.put(section, hits);
         if(maxHitsSection.equals("") || sectionHitMonitor.get(maxHitsSection) < hits) {
             maxHitsSection = section;
         }
     }
 
-    public void clearSectionHits() {
+    private void clearSectionHits() {
         sectionHitMonitor = new HashMap<String, Integer>();
         maxHitsSection = "";
     }
