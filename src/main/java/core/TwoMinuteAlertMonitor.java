@@ -1,8 +1,10 @@
 package core;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 public class TwoMinuteAlertMonitor extends HttpAlertMonitor {
@@ -17,6 +19,11 @@ public class TwoMinuteAlertMonitor extends HttpAlertMonitor {
 
     private static boolean isActiveAlert = false;
 
+    @Inject
+    public TwoMinuteAlertMonitor(@Named("core.twominutealertmonitor.alert.threshold") int alertThreshold) {
+        ALERT_THRESHOLD = alertThreshold;
+    }
+
     public int getIntervalInSeconds() {
         return INTERVAL_IN_SECONDS;
     }
@@ -27,10 +34,6 @@ public class TwoMinuteAlertMonitor extends HttpAlertMonitor {
 
     public void processEvent(HttpEvent event) {
         addToHits();
-    }
-
-    private int getNextIndex() {
-        return (currentIndex + 1) % WINDOW_SIZE;
     }
 
     public void run() {
@@ -51,13 +54,17 @@ public class TwoMinuteAlertMonitor extends HttpAlertMonitor {
         currentIndex = getNextIndex();
     }
 
+    private int getNextIndex() {
+        return (currentIndex + 1) % WINDOW_SIZE;
+    }
+
     private String getCurrentDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("[dd/MMM/yyyy:HH:mm:ss Z]", Locale.US);
         Date date = new Date();
         return dateFormat.format(date);
     }
 
-    public void addToHits() {
+    private void addToHits() {
         hitsAtSecond[currentIndex] += 1;
         totalHitsInTwoMinutes++;
     }

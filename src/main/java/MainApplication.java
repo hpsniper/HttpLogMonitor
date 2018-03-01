@@ -4,36 +4,44 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import core.TwoMinuteAlertMonitor;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.name.Named;
+import core.*;
 import org.apache.commons.io.input.Tailer;
 
-import core.HttpAlertMonitor;
-import core.TailListener;
-import core.TenSecondAlertMonitor;
-
 public class MainApplication {
-    private final Integer poolSize;
     private final TenSecondAlertMonitor tenSecondAlertMonitor;
     private final TwoMinuteAlertMonitor twoMinuteAlertMonitor;
+    private final String logfileLocation;
 
-    public MainApplication(Integer poolSize, TenSecondAlertMonitor tenSecondAlertMonitor, TwoMinuteAlertMonitor twoMinuteAlertMonitor) {
-        this.poolSize = poolSize;
+    @Inject
+    public MainApplication(
+            TenSecondAlertMonitor tenSecondAlertMonitor,
+            TwoMinuteAlertMonitor twoMinuteAlertMonitor,
+            @Named("main.logfile.location") String logfileLocation
+    ) {
         this.tenSecondAlertMonitor = tenSecondAlertMonitor;
         this.twoMinuteAlertMonitor = twoMinuteAlertMonitor;
+        this.logfileLocation = logfileLocation;
     }
 
     public static void main(String[] args) {
-        MainApplication app = new MainApplication(1, new TenSecondAlertMonitor(), new TwoMinuteAlertMonitor());
+        Injector injector = Guice.createInjector(new AlertModule());
+        MainApplication app = injector.getInstance(MainApplication.class);
         app.run();
     }
 
     private void run() {
         setupMonitors();
-        tailLogFile();
+        tailLogFileForMonitors();
     }
 
     private void setupMonitors() {
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(poolSize);
+        int numCpus = Runtime.getRuntime().availableProcessors();
+        System.out.println("Starting service using a threadpool of size '" + (numCpus + 1) + "'");
+        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(numCpus + 1);
         executor.scheduleAtFixedRate(
                 tenSecondAlertMonitor,
                 tenSecondAlertMonitor.getInitialDelayInSeconds(),
@@ -41,7 +49,6 @@ public class MainApplication {
                 TimeUnit.SECONDS
         )
         ;
-        executor = new ScheduledThreadPoolExecutor(poolSize);
         executor.scheduleAtFixedRate(
                 twoMinuteAlertMonitor,
                 twoMinuteAlertMonitor.getInitialDelayInSeconds(),
@@ -50,12 +57,12 @@ public class MainApplication {
         );
     }
 
-    private void tailLogFile() {
+    private void tailLogFileForMonitors() {
         ArrayList<HttpAlertMonitor> monitors = new ArrayList<HttpAlertMonitor>();
         monitors.add(tenSecondAlertMonitor);
         monitors.add(twoMinuteAlertMonitor);
         TailListener tailListener = new TailListener(monitors);
-        File file = new File(getClass().getResource("/basiclogfile.log").getFile());
+        File file = new File(getClass().getResource(logfileLocation).getFile());
         Tailer tailer = new Tailer(file, tailListener, 300);
         tailer.run();
     }
