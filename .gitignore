@@ -1,7 +1,7 @@
 # IntelliK
 .idea/
-.iml
-.iws
+*.iml
+*.iws
 
 # Maven
 log/
