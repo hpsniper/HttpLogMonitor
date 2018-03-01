@@ -19,6 +19,7 @@ public class AlertModule extends AbstractModule {
             Names.bindProperties(binder(), properties);
         } catch (IOException e) {
             System.out.println("ERROR: Could not load properties");
+            throw new RuntimeException(e);
         }
 
         bind(LogFormat.class).to(CommonLog.class);

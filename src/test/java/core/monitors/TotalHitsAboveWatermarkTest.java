@@ -1,31 +1,27 @@
-package core;
+package core.monitors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import core.AlertModule;
+import core.HttpEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Optional;
 
-public class TwoMinuteAlertMonitorTest {
+public class TotalHitsAboveWatermarkTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final HttpEvent httpEvent = mock(HttpEvent.class);
 
-    public TwoMinuteAlertMonitor getMonitor(Optional<Integer> threshold) {
-        if (threshold.isPresent()) {
-            return new TwoMinuteAlertMonitor(threshold.get());
-        }
-
+    public TotalHitsAboveWatermark getMonitor() {
         Injector injector = Guice.createInjector(new AlertModule());
-        return injector.getInstance(TwoMinuteAlertMonitor.class);
+        return injector.getInstance(TotalHitsAboveWatermark.class);
     }
 
     @BeforeEach
@@ -47,7 +43,7 @@ public class TwoMinuteAlertMonitorTest {
         outContent.reset();
     }
     private String generateAlertMessage(int windowSize, int totalHitsInWindow, double averageRate) {
-        return String.format("High traffic generated an alert - total hits in %d second window: '%d' average hit rate: '%f', triggered at ", windowSize, totalHitsInWindow, averageRate);
+        return String.format("High traffic generated an alert - %s - triggered at ", generateHitRateOutput(windowSize, totalHitsInWindow, averageRate));
     }
 
     private void assertRecoveryMessage(int windowSize, int totalHitsInWindow, double averageRate) {
@@ -56,12 +52,16 @@ public class TwoMinuteAlertMonitorTest {
     }
 
     private String generateRecoveryMessage(int windowSize, int totalHitsInWindow, double averageRate) {
-        return String.format("High traffic alert recovered - total hits in %d second window: '%d' average hit rate: '%f', recovered at ", windowSize, totalHitsInWindow, averageRate);
+        return String.format("High traffic alert recovered - %s - recovered at ", generateHitRateOutput(windowSize, totalHitsInWindow, averageRate));
+    }
+
+    private String generateHitRateOutput(int windowSize, int totalHitsInWindow, double averageRate) {
+        return String.format("total hits in %d second window: %d, average hit rate: %.2f", windowSize, totalHitsInWindow, averageRate);
     }
 
     @Test
     public void testJustShyOfThresholdNoAlert() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
         monitor.run();
@@ -70,7 +70,7 @@ public class TwoMinuteAlertMonitorTest {
 
     @Test
     public void testJustMeetsThresholdAlert() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
@@ -80,7 +80,7 @@ public class TwoMinuteAlertMonitorTest {
 
     @Test
     public void testJustMeetsThresholdRecoversAfterOneSecond() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
@@ -92,7 +92,7 @@ public class TwoMinuteAlertMonitorTest {
 
     @Test
     public void testDoubleThresholdRecoversAfterTwoSeconds() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
@@ -109,7 +109,7 @@ public class TwoMinuteAlertMonitorTest {
 
     @Test
     public void testBounceBackToAlertAfterRecovery() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);
@@ -137,7 +137,7 @@ public class TwoMinuteAlertMonitorTest {
 
     @Test
     public void testFourEventsASecondForTwoMinutesRecoversAfterThirtyOneSeconds() {
-        TwoMinuteAlertMonitor monitor = getMonitor(Optional.of(3));
+        TotalHitsAboveWatermark monitor = getMonitor();
 
         monitor.processEvent(httpEvent);
         monitor.processEvent(httpEvent);

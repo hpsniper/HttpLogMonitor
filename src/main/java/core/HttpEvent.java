@@ -37,7 +37,7 @@ public class HttpEvent {
     public String getSection() {
         // java's little nuance to get the second index of a character
         int endIndex = path.indexOf("/", path.indexOf("/") + 1);
-        // endIndex = -1 when a second index doesn't exist
+        // endIndex == -1 when a second index doesn't exist
         return endIndex <= -1 ? path : path.substring(0, endIndex);
     }
 

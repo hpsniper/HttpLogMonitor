@@ -10,7 +10,7 @@ class TestLogCreator {
 
     private void writeLogFile() {
         LogCreator logCreator = new LogCreator("/basiclogfile.log", new CommonLog());
-        logCreator.writeLogLines(3);
+        logCreator.writeLogLines(96);
     }
 
     @Test

@@ -9,21 +9,27 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.name.Named;
 import core.*;
+import core.monitors.HttpAlertMonitor;
+import core.monitors.MostSectionHitsForDuration;
+import core.monitors.TotalHitsAboveWatermark;
 import org.apache.commons.io.input.Tailer;
 
 public class MainApplication {
-    private final TenSecondAlertMonitor tenSecondAlertMonitor;
-    private final TwoMinuteAlertMonitor twoMinuteAlertMonitor;
+    private final TailListener tailListener;
+    private final MostSectionHitsForDuration mostSectionHitsForDuration;
+    private final TotalHitsAboveWatermark totalHitsAboveWatermark;
     private final String logfileLocation;
 
     @Inject
     public MainApplication(
-            TenSecondAlertMonitor tenSecondAlertMonitor,
-            TwoMinuteAlertMonitor twoMinuteAlertMonitor,
+            TailListener tailListener,
+            MostSectionHitsForDuration mostSectionHitsForDuration,
+            TotalHitsAboveWatermark totalHitsAboveWatermark,
             @Named("main.logfile.location") String logfileLocation
     ) {
-        this.tenSecondAlertMonitor = tenSecondAlertMonitor;
-        this.twoMinuteAlertMonitor = twoMinuteAlertMonitor;
+        this.tailListener = tailListener;
+        this.mostSectionHitsForDuration = mostSectionHitsForDuration;
+        this.totalHitsAboveWatermark = totalHitsAboveWatermark;
         this.logfileLocation = logfileLocation;
     }
 
@@ -43,25 +49,25 @@ public class MainApplication {
         System.out.println("Starting service using a threadpool of size '" + (numCpus + 1) + "'");
         ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(numCpus + 1);
         executor.scheduleAtFixedRate(
-                tenSecondAlertMonitor,
-                tenSecondAlertMonitor.getInitialDelayInSeconds(),
-                tenSecondAlertMonitor.getIntervalInSeconds(),
+                mostSectionHitsForDuration,
+                mostSectionHitsForDuration.getIntervalInSeconds(), // initialDelay
+                mostSectionHitsForDuration.getIntervalInSeconds(), // run every interval
                 TimeUnit.SECONDS
-        )
-        ;
+        );
+
         executor.scheduleAtFixedRate(
-                twoMinuteAlertMonitor,
-                twoMinuteAlertMonitor.getInitialDelayInSeconds(),
-                twoMinuteAlertMonitor.getIntervalInSeconds(),
+                totalHitsAboveWatermark,
+                totalHitsAboveWatermark.getIntervalInSeconds(), // initialDelay
+                totalHitsAboveWatermark.getIntervalInSeconds(), // run every interval
                 TimeUnit.SECONDS
         );
     }
 
     private void tailLogFileForMonitors() {
         ArrayList<HttpAlertMonitor> monitors = new ArrayList<HttpAlertMonitor>();
-        monitors.add(tenSecondAlertMonitor);
-        monitors.add(twoMinuteAlertMonitor);
-        TailListener tailListener = new TailListener(monitors);
+        monitors.add(mostSectionHitsForDuration);
+        monitors.add(totalHitsAboveWatermark);
+        tailListener.setMonitors(monitors);
         File file = new File(getClass().getResource(logfileLocation).getFile());
         Tailer tailer = new Tailer(file, tailListener, 300);
         tailer.run();
