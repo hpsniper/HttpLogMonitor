@@ -81,7 +81,7 @@ public class TotalHitsAboveWatermark extends HttpAlertMonitor {
     }
 
     private int getAverageRateDivisor() {
-        return goneOnceAround ? windowSizeInSeconds : (currentIndex + 1);
+        return goneOnceAround ? (windowSizeInSeconds * intervalInSeconds) : ( (currentIndex + 1) * intervalInSeconds );
     }
 
     private String getCurrentDateTime() {
