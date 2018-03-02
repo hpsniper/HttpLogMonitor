@@ -1,10 +1,12 @@
 # HttpLogMonitor
 An http console log monitor progrom
 
+### Running the application
 The `MainApplication.java` is contained in `src/main/java/`. Running that file will run the main program and the two alert monitors contained in `src/main/java/core/monitors/`
 * `MostSectionHitsForDuration.java`
 * `TotalHitsAboveWatermark.java`
 
+### Configuration
 Application configuration can be found in `src/main/resources/config.properties`
 
 * `core.monitors.mostsectionhitsforduration.interval.in.seconds=10` - Sets the interval to run the `MostSectionHitsForDuration` runnable object. (in essence, to report the section with the most hits every 10 seconds)
@@ -15,6 +17,7 @@ Application configuration can be found in `src/main/resources/config.properties`
 
 * `main.logfile.location=/basiclogfile.log` - Sets the location of the logfile to tail and monitor.
 
+### Testing
 Included in `src/test/resources` are configurations specific for the testing support. 
 
 Also in `srce/test/java/core` are some test files
@@ -22,3 +25,12 @@ Also in `srce/test/java/core` are some test files
 `LogCreator.java` and `TestLogCreator.java` are just utility files to add random common log formatted entries to the `/basiclogfile.log` during testing of the `MainApplication.java`
 
 There exist 2 test files inside `/monitors` for testing `MostSectionHitsForDuration` and `TotalHitsAboveWatermark`
+
+### Possible Improvements
+
+Things that could improve this project
+* Adding transactions in the monitors as access to variables from `run()` and `processEvent(HttpEvent event)` could happen at the same time and pose race conditions.
+* Ideally sending HttpEvents to the monitors would be done by some kind of message broker, rather than called explicitly from the `TailListener`
+* Just using System.out.println to manifest the information isn't ideal.
+* Currently the monitors don't look at the requests timestamps at all to determine when things are happening. They just go by when they receive the processEvent. They should look at timestamps to be able to handle events that happened in the past.
+* Storage of these alerts and events would be necessary to facilitate queries on past events and monitoring as it happened, not as it was learned about by the monitor
