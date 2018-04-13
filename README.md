@@ -5,7 +5,7 @@ Create a simple console program that monitors HTTP traffic from a logfile:
 * Consume a w3c common log formatted HTTP log 
 * The program should be able to run continuously to consume the log as it's written to
 * Every 10s, display in the console the sections of the web site with the most hits, and some other statistics on the traffic as a whole.
-* Whenever total traffic for the past 2 minutes exceeds a certain number on average, add a message saying that “High traffic generated an alert - hits = {value}, triggered at {time}”
+* Whenever total traffic for the past 2 minutes exceeds a certain number on average, add a message saying that "High traffic alert triggered - total hits in {120} second window: {hits}, average hit rate: {hit-rate} - triggered at {currenttime}"
 * Whenever the total traffic drops again below that value on average for the past 2 minutes, add another message detailing when the alert recovered
 
 ### Glossary
