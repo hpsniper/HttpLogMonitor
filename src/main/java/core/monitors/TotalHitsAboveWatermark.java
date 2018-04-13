@@ -51,10 +51,7 @@ public class TotalHitsAboveWatermark extends HttpAlertMonitor {
             System.out.println("High traffic alert recovered - " + getHitRateAverageOutput() + " - recovered at " + getCurrentDateTime());
         }
 
-        if(hitsAtSecond[getNextIndex()] != 0) {
-            totalHitsInDuration -= hitsAtSecond[getNextIndex()];
-        }
-
+        totalHitsInDuration -= hitsAtSecond[getNextIndex()];
         currentIndex = getNextIndex();
     }
 
