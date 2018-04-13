@@ -44,7 +44,7 @@ public class TotalHitsAboveWatermark extends HttpAlertMonitor {
         if (averageMeetsWatermark()) {
             if (!isActiveAlert) {
                 isActiveAlert = true;
-                System.out.println("High traffic generated an alert - " + getHitRateAverageOutput() + " - triggered at " + getCurrentDateTime());
+                System.out.println("High traffic alert triggered - " + getHitRateAverageOutput() + " - triggered at " + getCurrentDateTime());
             }
         } else if(isActiveAlert) {
             isActiveAlert = false;
@@ -78,7 +78,7 @@ public class TotalHitsAboveWatermark extends HttpAlertMonitor {
     }
 
     private int getAverageRateDivisor() {
-        return goneOnceAround ? windowSizeInSeconds : (currentIndex + 1);
+        return goneOnceAround ? (windowSizeInSeconds * intervalInSeconds) : ( (currentIndex + 1) * intervalInSeconds );
     }
 
     private String getCurrentDateTime() {

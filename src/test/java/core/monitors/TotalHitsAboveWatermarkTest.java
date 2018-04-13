@@ -43,7 +43,7 @@ public class TotalHitsAboveWatermarkTest {
         outContent.reset();
     }
     private String generateAlertMessage(int windowSize, int totalHitsInWindow, double averageRate) {
-        return String.format("High traffic generated an alert - %s - triggered at ", generateHitRateOutput(windowSize, totalHitsInWindow, averageRate));
+        return String.format("High traffic alert triggered - %s - triggered at ", generateHitRateOutput(windowSize, totalHitsInWindow, averageRate));
     }
 
     private void assertRecoveryMessage(int windowSize, int totalHitsInWindow, double averageRate) {

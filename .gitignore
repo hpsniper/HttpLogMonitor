@@ -1,0 +1,8 @@
+# IntelliK
+.idea/
+*.iml
+*.iws
+
+# Maven
+log/
+target/
