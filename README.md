@@ -9,7 +9,7 @@ Create a simple console program that monitors HTTP traffic from a logfile:
 * Whenever the total traffic drops again below that value on average for the past 2 minutes, add another message detailing when the alert recovered
 
 ### Glossary
-* Section - What's before the second '/' in a URL. i.e. the section for "http://my.site.com/pages/create' is "http://my.site.com/pages"
+* Section - What's after the scheme and before the second '/' in a URL. i.e. the section for "http://my.site.com/pages/create' is "my.site.com/pages"
 * Common Log Format - https://en.wikipedia.org/wiki/Common_Log_Format
 
 ### Running the application
