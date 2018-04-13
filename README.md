@@ -1,5 +1,16 @@
-# HttpLogMonitor
-An http console log monitor progrom
+# HttpLogMonitor Console Program
+
+Create a simple console program that monitors HTTP traffic from a logfile:
+
+* Consume a w3c common log formatted HTTP log 
+* The program should be able to run continuously to consume the log as it's written to
+* Every 10s, display in the console the sections of the web site with the most hits, and some other statistics on the traffic as a whole.
+* Whenever total traffic for the past 2 minutes exceeds a certain number on average, add a message saying that “High traffic generated an alert - hits = {value}, triggered at {time}”
+* Whenever the total traffic drops again below that value on average for the past 2 minutes, add another message detailing when the alert recovered
+
+### Glossary
+* Section - What's before the second '/' in a URL. i.e. the section for "http://my.site.com/pages/create' is "http://my.site.com/pages"
+* Common Log Format - https://en.wikipedia.org/wiki/Common_Log_Format
 
 ### Running the application
 The `MainApplication.java` is contained in `src/main/java/`. Running that file will run the main program and the two alert monitors contained in `src/main/java/core/monitors/`
