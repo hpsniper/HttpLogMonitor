@@ -31,7 +31,7 @@ Application configuration can be found in `src/main/resources/config.properties`
 ### Testing
 Included in `src/test/resources` are configurations specific for the testing support. 
 
-Also in `srce/test/java/core` are some test files
+Also in `src/test/java/core` are some test files
 
 `LogCreator.java` and `TestLogCreator.java` are just utility files to add random common log formatted entries to the `/basiclogfile.log` during testing of the `MainApplication.java`
 
